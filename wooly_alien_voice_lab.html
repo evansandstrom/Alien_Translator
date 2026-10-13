@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wooly Alien Translator — Voice Lab</title>
+<style>
+:root{color-scheme:dark;--bg:#0a1016;--panel:#141f29;--panel2:#0e171f;--line:#2a3b49;--text:#f1f7fa;--muted:#9db0bd;--lime:#d6ff72;--mint:#94f1cf;--pink:#d5a2ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#264a50 0,#152730 38%,#090e14 78%);font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif;color:var(--text);padding:25px}
+main{width:min(1050px,100%);margin:auto}.eyebrow{display:flex;gap:9px;align-items:center;color:var(--mint);font-size:.75rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.dot{width:9px;height:9px;background:var(--lime);border-radius:50%;box-shadow:0 0 14px #d6ff72}
+h1{font-size:clamp(2.5rem,7vw,5.4rem);line-height:.94;letter-spacing:-.06em;margin:18px 0 14px}h1 span{color:var(--lime)}.lede{color:var(--muted);line-height:1.65;max-width:720px;margin:0 0 26px}
+.layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(270px,.85fr);gap:18px}.panel{background:linear-gradient(145deg,#192632f5,#101821fa);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 20px 60px #0003}.panel h2{font-size:1.08rem;margin:0 0 6px}.sub{color:var(--muted);font-size:.88rem;line-height:1.5;margin:0 0 18px}
+.mic-stage{background:var(--panel2);border:1px solid #2c414d;border-radius:17px;padding:20px;text-align:center}.mic-icon{display:grid;place-items:center;width:74px;height:74px;margin:0 auto 13px;border-radius:23px;background:#263b3e;color:var(--lime)}.mic-icon svg{width:35px;height:35px}.state{font-weight:850;font-size:1.02rem}.status{font-size:.84rem;color:var(--muted);margin-top:6px;min-height:1.3em}
+.wave{height:54px;display:flex;align-items:center;justify-content:center;gap:3px;margin:8px auto 4px;overflow:hidden}.wave i{width:4px;min-width:3px;height:5px;border-radius:5px;background:var(--mint);opacity:.8}.wave.active i{animation:wave .45s ease-in-out infinite alternate}.wave i:nth-child(3n){animation-delay:.13s}.wave i:nth-child(4n){animation-delay:.22s}@keyframes wave{to{height:44px;background:var(--lime);opacity:1}}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}button{font:inherit;font-weight:850;border:1px solid #405565;border-radius:12px;padding:12px 15px;cursor:pointer;background:#253744;color:var(--text);transition:.15s}button:hover:not(:disabled){filter:brightness(1.13);transform:translateY(-1px)}button:disabled{opacity:.38;cursor:not-allowed}.primary{background:var(--lime);color:#17200c;border-color:var(--lime)}.record{background:#5c2631;border-color:#a44d5b}.stop{background:#303642}.actions button{flex:1;min-width:115px}
+.filebox{display:flex;gap:12px;align-items:center;margin-top:13px;padding:13px;background:#111a22;border:1px dashed #3a5060;border-radius:13px}.filebox input{width:100%;min-width:0;color:var(--muted);font-size:.8rem}
+.track{margin-top:17px;padding:15px;background:#101920;border:1px solid #2b3c49;border-radius:14px}.track-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.track-title{font-size:.9rem;font-weight:850}.tag{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mint);background:#1d3935;border-radius:20px;padding:5px 8px}.track small{display:block;color:var(--muted);margin-top:9px;line-height:1.4}.track audio{width:100%;height:38px;filter:invert(.88) hue-rotate(130deg);opacity:.92}
+.control{padding:13px 0;border-bottom:1px solid #2a3945}.control:last-child{border:0}.control-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px;font-size:.89rem;font-weight:750}.control output{color:var(--lime);font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--lime);cursor:pointer}.hint{font-size:.76rem;color:var(--muted);line-height:1.4;margin-top:7px}.selectwrap{margin:12px 0 4px}label.selectlabel{display:block;font-size:.85rem;font-weight:800;margin-bottom:8px}select{width:100%;border-radius:10px;padding:11px;background:#0e171f;color:var(--text);border:1px solid #405362;font:inherit}
+.checkrow{display:flex;align-items:flex-start;gap:10px;margin-top:15px;color:#dce6eb;font-size:.85rem;line-height:1.4}.checkrow input{accent-color:var(--lime);margin-top:3px}.note{color:var(--muted);font-size:.78rem;line-height:1.6;margin:18px 2px 0}.full{margin-top:18px}.full .actions button{flex:initial}.meter{height:5px;border-radius:9px;background:#263540;overflow:hidden;margin-top:8px}.meter span{display:block;height:100%;width:0;background:var(--lime);transition:width .15s}
+footer{text-align:center;color:#748997;font-size:.78rem;line-height:1.6;margin:20px auto 0;max-width:760px}
+@media(max-width:780px){body{padding:13px}.layout{grid-template-columns:1fr}.panel{padding:17px}h1{font-size:clamp(2.5rem,12vw,4rem)}}@media(max-width:430px){.actions button{min-width:100%}.filebox{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<main>
+ <div class="eyebrow"><span class="dot"></span> Galactic language lab · voice transformation</div>
+ <h1>Wooly Alien<br><span>Voice Lab</span></h1>
+ <p class="lede">Speak a sentence in your own voice, then mutate it into a deep, raspy, growling alien transmission. Record with your microphone or load an audio file. All processing happens in this browser.</p>
+
+ <div class="layout">
+  <section class="panel">
+   <h2>01 / Capture your voice</h2>
+   <p class="sub">Allow microphone access when prompted. Speak clearly for a few seconds, then stop the recording.</p>
+   <div class="mic-stage">
+    <div class="mic-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></div>
+    <div class="state" id="recordState">Microphone standing by</div>
+    <div class="status" id="recordStatus">Your browser will ask for permission when you start.</div>
+    <div class="wave" id="wave" aria-hidden="true"></div>
+    <div class="meter"><span id="inputMeter"></span></div>
+    <div class="actions">
+     <button class="record" id="recordBtn">● Record</button>
+     <button class="stop" id="stopRecordBtn" disabled>■ Stop recording</button>
+    </div>
+   </div>
+   <div class="filebox"><label for="fileInput" style="font-size:.83rem;font-weight:800;white-space:nowrap">Or use audio file</label><input id="fileInput" type="file" accept="audio/*"></div>
+   <div class="track">
+    <div class="track-head"><span class="track-title">Original human voice</span><span class="tag">Source</span></div>
+    <audio id="originalPlayer" controls preload="metadata"></audio>
+    <small id="originalInfo">Record something or choose an audio file to begin.</small>
+   </div>
+   <div class="actions">
+    <button class="primary" id="transformBtn" disabled>✦ Transform into alien</button>
+    <button id="resetBtn">Reset</button>
+   </div>
+   <div class="track">
+    <div class="track-head"><span class="track-title">Alien transmission</span><span class="tag">Processed</span></div>
+    <audio id="alienPlayer" controls preload="metadata"></audio>
+    <small id="alienInfo">Your transformed voice will appear here.</small>
+   </div>
+   <div class="actions">
+    <button id="downloadBtn" disabled>↓ Download alien WAV</button>
+   </div>
+  </section>
+
+  <aside class="panel">
+   <h2>02 / Mutate the voice</h2>
+   <p class="sub">Start with the default alien preset, then adjust the controls and transform again.</p>
+   <div class="selectwrap"><label class="selectlabel" for="preset">Creature profile</label>
+    <select id="preset">
+     <option value="beast">Cavern beast — deep and rough</option>
+     <option value="friendly">Friendly fuzzball — warm and bubbly</option>
+     <option value="radio">Damaged space radio — crunchy and distant</option>
+     <option value="nightmare">Nightmare growler — dark and distorted</option>
+     <option value="custom">Custom — use my settings</option>
+    </select>
+   </div>
+   <div class="control"><div class="control-head"><label for="pitch">Pitch shift</label><output id="pitchOut">-5 semitones</output></div><input id="pitch" type="range" min="-12" max="8" step="1" value="-5"><div class="hint">Changes pitch while keeping the clip duration nearly the same.</div></div>
+   <div class="control"><div class="control-head"><label for="formant">Vocal body</label><output id="formantOut">55%</output></div><input id="formant" type="range" min="0" max="100" value="55"><div class="hint">Shapes the voice with resonant filters for a more creature-like throat.</div></div>
+   <div class="control"><div class="control-head"><label for="grit">Raspy distortion</label><output id="gritOut">38%</output></div><input id="grit" type="range" min="0" max="100" value="38"><div class="hint">Adds roughness and growly harmonics. Too much can obscure words.</div></div>
+   <div class="control"><div class="control-head"><label for="growl">Low growl layer</label><output id="growlOut">48%</output></div><input id="growl" type="range" min="0" max="100" value="48"><div class="hint">Mixes a sub-octave rumble under the original transformed voice.</div></div>
+   <div class="control"><div class="control-head"><label for="breath">Breath / rasp</label><output id="breathOut">22%</output></div><input id="breath" type="range" min="0" max="100" value="22"><div class="hint">Adds filtered noise for airy, gravelly texture.</div></div>
+   <div class="control"><div class="control-head"><label for="echo">Echo / space</label><output id="echoOut">18%</output></div><input id="echo" type="range" min="0" max="100" value="18"><div class="hint">Adds a little echo and room-like depth.</div></div>
+   <div class="control"><div class="control-head"><label for="variation">Alien wobble</label><output id="variationOut">28%</output></div><input id="variation" type="range" min="0" max="100" value="28"><div class="hint">Modulates the voice subtly so it feels less human and static.</div></div>
+   <label class="checkrow"><input id="normalize" type="checkbox" checked><span><b>Normalize output</b><br>Balances the rendered level to help prevent quiet exports.</span></label>
+   <div class="actions"><button id="randomizeBtn">✧ Randomize effects</button><button id="defaultsBtn">Restore preset</button></div>
+  </aside>
+ </div>
+ <p class="note"><b>Audio note:</b> This version uses offline browser audio processing and exports a WAV file. Pitch shifting is done with resampling, so lower pitches may sound slightly longer or more synthetic than a professional pitch shifter. Voice recordings stay on your device; this page does not upload them anywhere.</p>
+ <footer>For best results, use a clear recording with little background noise. Microphone recording requires permission and usually works on HTTPS or localhost; loading an audio file works from a local HTML file in modern browsers.</footer>
+</main>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const ids = ['pitch','formant','grit','growl','breath','echo','variation'];
+const defaults = {
+ beast:{pitch:-5,formant:55,grit:38,growl:48,breath:22,echo:18,variation:28},
+ friendly:{pitch:-2,formant:35,grit:16,growl:25,breath:12,echo:12,variation:42},
+ radio:{pitch:-3,formant:70,grit:52,growl:24,breath:32,echo:35,variation:18},
+ nightmare:{pitch:-9,formant:78,grit:72,growl:68,breath:38,echo:28,variation:52},
+ custom:{pitch:-5,formant:55,grit:38,growl:48,breath:22,echo:18,variation:28}
+};
+let sourceBlob=null, sourceBuffer=null, sourceName='', originalURL=null, alienURL=null, alienBlob=null;
+let recorder=null, stream=null, chunks=[], audioContext=null, meterRAF=0, analyser=null, micSource=null, recording=false, processing=false;
+const wave = $('wave');
+for(let i=0;i<52;i++){const el=document.createElement('i');wave.appendChild(el);}
+function setStatus(a,b){$('recordState').textContent=a;$('recordStatus').textContent=b;}
+function fmtDuration(s){if(!Number.isFinite(s))return '';const m=Math.floor(s/60),sec=Math.floor(s%60);return `${m}:${String(sec).padStart(2,'0')}`;}
+function updateLabels(){
+ $('pitchOut').textContent=(Number($('pitch').value)>0?'+':'')+$('pitch').value+' semitones';
+ ['formant','grit','growl','breath','echo','variation'].forEach(id=>$(id+'Out').textContent=$(id).value+'%');
+}
+function markCustom(){if(!$('preset').dataset.setting) $('preset').value='custom';}
+ids.forEach(id=>$(id).addEventListener('input',()=>{updateLabels();markCustom();}));
+$('preset').addEventListener('change',()=>applyPreset($('preset').value));
+function applyPreset(name){$('preset').dataset.setting='1';const p=defaults[name]||defaults.beast;ids.forEach(id=>$(id).value=p[id]);$('preset').value=name;delete $('preset').dataset.setting;updateLabels();}
+updateLabels();
+
+function setSource(blob,name){
+ sourceBlob=blob;sourceName=name||'voice recording';sourceBuffer=null;
+ if(originalURL)URL.revokeObjectURL(originalURL);
+ originalURL=URL.createObjectURL(blob);$('originalPlayer').src=originalURL;
+ $('originalInfo').textContent=`${sourceName} · loading audio…`;
+ $('transformBtn').disabled=false;$('alienPlayer').removeAttribute('src');$('alienPlayer').load();
+ $('alienInfo').textContent='Ready to transform.';$('downloadBtn').disabled=true;
+ if(alienURL){URL.revokeObjectURL(alienURL);alienURL=null;}alienBlob=null;
+ $('alienInfo').textContent='Your transformed voice will appear here.';
+ $('recordState').textContent='Voice captured';$('recordStatus').textContent='Ready for alien transformation.';
+ loadSourceBuffer(blob);
+}
+async function loadSourceBuffer(blob){
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw new Error('Web Audio API not supported');
+  const temp=new AC();const data=await blob.arrayBuffer();const decoded=await temp.decodeAudioData(data.slice(0));sourceBuffer=decoded;
+  $('originalInfo').textContent=`${sourceName} · ${fmtDuration(decoded.duration)} · ${decoded.numberOfChannels} channel${decoded.numberOfChannels===1?'':'s'}`;
+  await temp.close();
+ }catch(e){sourceBuffer=null;$('transformBtn').disabled=true;$('originalInfo').textContent='Could not decode this audio. Try a WAV, MP3, M4A, or WebM recording in a modern browser.';setStatus('Audio could not be read',e.message||'Try another audio file.');}
+}
+async function startMeter(s){
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;audioContext=new AC();await audioContext.resume();
+  analyser=audioContext.createAnalyser();analyser.fftSize=256;micSource=audioContext.createMediaStreamSource(s);micSource.connect(analyser);
+  const data=new Uint8Array(analyser.frequencyBinCount);
+  const tick=()=>{if(!analyser||!recording)return;analyser.getByteTimeDomainData(data);let sum=0;for(let i=0;i<data.length;i++){const v=(data[i]-128)/128;sum+=v*v;}const rms=Math.sqrt(sum/data.length);$('inputMeter').style.width=Math.min(100,rms*260)+'%';meterRAF=requestAnimationFrame(tick);};
+  tick();
+ }catch(e){}
+}
+function stopMeter(){
+ cancelAnimationFrame(meterRAF);$('inputMeter').style.width='0%';
+ try{micSource&&micSource.disconnect();analyser&&analyser.disconnect();}catch(e){}
+ micSource=null;analyser=null;
+ if(audioContext){const c=audioContext;audioContext=null;c.close().catch(()=>{});}
+}
+async function startRecording(){
+ if(recording)return;
+ if(!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder){setStatus('Recording unavailable','Your browser does not support microphone recording here. Try Chrome, Edge, or Safari on HTTPS/localhost, or load an audio file.');return;}
+ try{
+  stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+  let options={};
+  if(MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))options.mimeType='audio/webm;codecs=opus';
+  else if(MediaRecorder.isTypeSupported('audio/mp4'))options.mimeType='audio/mp4';
+  recorder=new MediaRecorder(stream,options);chunks=[];recording=true;
+  recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+  recorder.onerror=e=>{setStatus('Recording error',e.error?.message||'The browser could not record audio.');finishRecordingTracks();};
+  recorder.onstop=()=>{
+   const type=recorder.mimeType||chunks[0]?.type||'audio/webm';const blob=new Blob(chunks,{type});
+   finishRecordingTracks();
+   if(blob.size>0)setSource(blob,'Microphone recording');else setStatus('No audio captured','Try recording again and speak closer to the microphone.');
+  };
+  recorder.start(200);$('recordBtn').disabled=true;$('stopRecordBtn').disabled=false;
+  $('transformBtn').disabled=true;wave.classList.add('active');setStatus('Recording…','Speak now. Press Stop recording when you are finished.');
+  await startMeter(stream);
+ }catch(e){
+  finishRecordingTracks();recording=false;
+  setStatus('Microphone permission needed',e.name==='NotAllowedError'?'Allow microphone access in your browser settings, or load an audio file instead.':(e.message||'Could not start the microphone.'));
+ }
+}
+function finishRecordingTracks(){
+ recording=false;stopMeter();if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+ $('recordBtn').disabled=false;$('stopRecordBtn').disabled=true;wave.classList.remove('active');
+}
+function stopRecording(){if(recorder&&recording&&recorder.state!=='inactive'){recording=false;$('recordBtn').disabled=false;$('stopRecordBtn').disabled=true;wave.classList.remove('active');stopMeter();recorder.stop();}else finishRecordingTracks();}
+$('recordBtn').addEventListener('click',startRecording);$('stopRecordBtn').addEventListener('click',stopRecording);
+$('fileInput').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(file){if(recording)stopRecording();setSource(file,file.name);setStatus('Audio file loaded','Ready for alien transformation.');}});
+function makeImpulse(ctx,seconds=1.1,decay=2.7){
+ const length=Math.floor(ctx.sampleRate*seconds),buf=ctx.createBuffer(2,length,ctx.sampleRate);
+ for(let c=0;c<2;c++){const d=buf.getChannelData(c);for(let i=0;i<length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/length,decay);}
+ return buf;
+}
+function makeDistortionCurve(amount){
+ const n=44100,curve=new Float32Array(n),k=amount*110+0.0001;
+ for(let i=0;i<n;i++){const x=i*2/n-1;curve[i]=((3+k)*x*20*(Math.PI/180))/(Math.PI+k*Math.abs(x));}
+ return curve;
+}
+function createNoiseBuffer(ctx,duration){
+ const b=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),d=b.getChannelData(0);
+ for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+ return b;
+}
+function getVal(id){return Number($(id).value)/100;}
+async function transform(){
+ if(!sourceBuffer){setStatus('No source audio','Record your voice or load an audio file first.');return;}
+ if(processing)return;processing=true;$('transformBtn').disabled=true;$('downloadBtn').disabled=true;
+ setStatus('Building alien voice…','Processing your audio locally. Longer clips can take a few seconds.');
+ try{
+  const pitchSemis=Number($('pitch').value),pitchRate=Math.pow(2,pitchSemis/12);
+  // Resampling pitch changes pitch and duration together. The subsequent offline graph layers resonance,
+  // distortion, low-frequency body, breath noise, wobble and echo into the final WAV.
+  const inBuf=sourceBuffer,ctxRate=inBuf.sampleRate;
+  const pitchedLength=Math.max(1,Math.ceil(inBuf.length/pitchRate));
+  const AC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+  if(!AC)throw new Error('Offline audio processing is not supported in this browser.');
+  const offline=new AC(2,pitchedLength,ctxRate);
+  const src=offline.createBufferSource();src.buffer=inBuf;src.playbackRate.value=pitchRate;
+  const form=getVal('formant'),grit=getVal('grit'),growl=getVal('growl'),breath=getVal('breath'),echo=getVal('echo'),wobble=getVal('variation');
+  const mainGain=offline.createGain();mainGain.gain.value=0.83;
+  const hp=offline.createBiquadFilter();hp.type='highpass';hp.frequency.value=65;
+  const low=offline.createBiquadFilter();low.type='lowshelf';low.frequency.value=170;low.gain.value=2+form*8;
+  const peak1=offline.createBiquadFilter();peak1.type='peaking';peak1.frequency.value=520+form*300;peak1.Q.value=1.1;peak1.gain.value= form*11-2;
+  const peak2=offline.createBiquadFilter();peak2.type='peaking';peak2.frequency.value=1050+form*850;peak2.Q.value=1.3;peak2.gain.value=form*7-1;
+  const peak3=offline.createBiquadFilter();peak3.type='peaking';peak3.frequency.value=2400;peak3.Q.value=1.6;peak3.gain.value=-form*5;
+  const shaper=offline.createWaveShaper();shaper.curve=makeDistortionCurve(grit);shaper.oversample='4x';
+  const wobbleGain=offline.createGain();wobbleGain.gain.value=1;
+  const lfo=offline.createOscillator(),lfoGain=offline.createGain();lfo.type='sine';lfo.frequency.value=3.1;lfoGain.gain.value=wobble*.23;lfo.connect(lfoGain);lfoGain.connect(wobbleGain.gain);
+  src.connect(hp);hp.connect(low);low.connect(peak1);peak1.connect(peak2);peak2.connect(peak3);
+  if(grit>0.005){peak3.connect(shaper);shaper.connect(wobbleGain);}else peak3.connect(wobbleGain);
+  wobbleGain.connect(mainGain);mainGain.connect(offline.destination);
+  // Growl: a separately pitch-lowered copy with low-pass filtering, mixed quietly under the main voice.
+  if(growl>0.005){
+   const sub=offline.createBufferSource();sub.buffer=inBuf;sub.playbackRate.value=Math.max(.35,pitchRate*.52);
+   const subLP=offline.createBiquadFilter();subLP.type='lowpass';subLP.frequency.value=300+form*180;
+   const subGain=offline.createGain();subGain.gain.value=growl*.44;
+   const subDist=offline.createWaveShaper();subDist.curve=makeDistortionCurve(Math.min(1,grit*.75+.15));subDist.oversample='2x';
+   sub.connect(subLP);subLP.connect(subDist);subDist.connect(subGain);subGain.connect(offline.destination);sub.start(0);
+  }
+  // Filtered noise layer for airy, raspy consonants. Gated by a slow envelope to avoid a constant hiss.
+  if(breath>0.005){
+   const nb=createNoiseBuffer(offline,inBuf.duration+0.1),ns=offline.createBufferSource();ns.buffer=nb;
+   const nf=offline.createBiquadFilter();nf.type='bandpass';nf.frequency.value=1200+form*1800;nf.Q.value=.55;
+   const ng=offline.createGain();ng.gain.value=breath*.045;ns.connect(nf);nf.connect(ng);ng.connect(offline.destination);ns.start(0);
+  }
+  // Short feedback-free echo via delay and gain.
+  if(echo>0.005){
+   const delay=offline.createDelay(1);delay.delayTime.value=.17+echo*.13;
+   const eg=offline.createGain();eg.gain.value=echo*.27;
+   const ef=offline.createBiquadFilter();ef.type='lowpass';ef.frequency.value=1600;
+   mainGain.connect(delay);delay.connect(ef);ef.connect(eg);eg.connect(offline.destination);
+   const verb=offline.createConvolver();verb.buffer=makeImpulse(offline,0.75,3);
+   const vg=offline.createGain();vg.gain.value=echo*.15;mainGain.connect(verb);verb.connect(vg);vg.connect(offline.destination);
+  }
+  lfo.start(0);src.start(0);
+  const rendered=await offline.startRendering();
+  let finalBuffer=rendered;
+  if($('normalize').checked){
+   let peak=0;for(let c=0;c<rendered.numberOfChannels;c++){const d=rendered.getChannelData(c);for(let i=0;i<d.length;i++)peak=Math.max(peak,Math.abs(d[i]));}
+   if(peak>0.00001){const gain=Math.min(1.8,.93/peak);const norm=new OfflineAudioContext(rendered.numberOfChannels,rendered.length,rendered.sampleRate);const s=norm.createBufferSource();s.buffer=rendered;const g=norm.createGain();g.gain.value=gain;s.connect(g);g.connect(norm.destination);s.start();finalBuffer=await norm.startRendering();}
+  }
+  alienBlob=audioBufferToWav(finalBuffer);
+  if(alienURL)URL.revokeObjectURL(alienURL);alienURL=URL.createObjectURL(alienBlob);
+  $('alienPlayer').src=alienURL;$('alienPlayer').load();$('alienInfo').textContent=`Alien WAV ready · ${fmtDuration(finalBuffer.duration)} · ${(alienBlob.size/1024).toFixed(0)} KB`;
+  $('downloadBtn').disabled=false;setStatus('Alien transmission ready','Play the transformed version below, adjust effects, and transform again.');
+ }catch(e){console.error(e);setStatus('Transformation failed',e.message||'Try a shorter or different audio clip.');}
+ finally{processing=false;$('transformBtn').disabled=!sourceBuffer;}
+}
+function audioBufferToWav(buffer){
+ const channels=buffer.numberOfChannels,sampleRate=buffer.sampleRate,frames=buffer.length,bits=16;
+ const dataBytes=frames*channels*bits/8,ab=new ArrayBuffer(44+dataBytes),v=new DataView(ab);
+ const str=(offset,s)=>{for(let i=0;i<s.length;i++)v.setUint8(offset+i,s.charCodeAt(i));};
+ str(0,'RIFF');v.setUint32(4,36+dataBytes,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,channels,true);v.setUint32(24,sampleRate,true);v.setUint32(28,sampleRate*channels*bits/8,true);v.setUint16(32,channels*bits/8,true);v.setUint16(34,bits,true);str(36,'data');v.setUint32(40,dataBytes,true);
+ let pos=44;const chans=[];for(let c=0;c<channels;c++)chans.push(buffer.getChannelData(c));
+ for(let i=0;i<frames;i++)for(let c=0;c<channels;c++){let s=Math.max(-1,Math.min(1,chans[c][i]));v.setInt16(pos,s<0?s*32768:s*32767,true);pos+=2;}
+ return new Blob([ab],{type:'audio/wav'});
+}
+$('transformBtn').addEventListener('click',transform);
+$('downloadBtn').addEventListener('click',()=>{
+ if(!alienBlob)return;const url=URL.createObjectURL(alienBlob),a=document.createElement('a');a.href=url;a.download='wooly-alien-voice.wav';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+});
+$('resetBtn').addEventListener('click',()=>{
+ if(recording)stopRecording();
+ sourceBlob=null;sourceBuffer=null;sourceName='';
+ if(originalURL)URL.revokeObjectURL(originalURL);if(alienURL)URL.revokeObjectURL(alienURL);
+ originalURL=alienURL=null;alienBlob=null;
+ $('originalPlayer').removeAttribute('src');$('originalPlayer').load();$('alienPlayer').removeAttribute('src');$('alienPlayer').load();
+ $('originalInfo').textContent='Record something or choose an audio file to begin.';$('alienInfo').textContent='Your transformed voice will appear here.';
+ $('transformBtn').disabled=true;$('downloadBtn').disabled=true;$('fileInput').value='';
+ setStatus('Microphone standing by','Your browser will ask for permission when you start.');$('recordState').textContent='Microphone standing by';
+ applyPreset('beast');
+});
+$('randomizeBtn').addEventListener('click',()=>{
+ $('preset').value='custom';
+ $('pitch').value=Math.floor(Math.random()*15)-10;
+ ['formant','grit','growl','breath','echo','variation'].forEach(id=>$(id).value=Math.floor(Math.random()*81)+10);
+ updateLabels();
+});
+$('defaultsBtn').addEventListener('click',()=>applyPreset($('preset').value==='custom'?'beast':$('preset').value));
+window.addEventListener('beforeunload',()=>{if(stream)stream.getTracks().forEach(t=>t.stop());if(originalURL)URL.revokeObjectURL(originalURL);if(alienURL)URL.revokeObjectURL(alienURL);});
+})();
+</script>
+</body>
+</html>
