@@ -1,0 +1,1 @@
+This is an alien translator. You have to allow it to have permission to record with your microphone. You can change effects using the equalizer on the right hand side. Be sure to press the green translate button between modifications.
